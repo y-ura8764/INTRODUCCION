@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentación Interactiva: Redes y Sistemas Operativos</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background: #0f172a; 
+      color: #f8fafc; 
+      overflow: hidden; 
+    }
+    
+    /* Layout de las diapositivas */
+    .slide { 
+      display: none; 
+      width: 100vw; 
+      height: 100vh; 
+      padding: 60px 80px; 
+      background: radial-gradient(circle at top right, #1e293b, #020617);
+      flex-direction: column; 
+    }
+    .slide.active { 
+      display: flex; 
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tipografía */
+    h1 { font-size: 3rem; color: #38bdf8; margin: 0 0 10px; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+    h2 { font-size: 2.2rem; color: #7dd3fc; margin: 0 0 20px; }
+    h3 { font-size: 1.5rem; color: #a7f3d0; margin: 0 0 15px; }
+    p, li { font-size: 1.2rem; line-height: 1.6; color: #cbd5e1; }
+    cite { font-size: 0.8rem; color: #64748b; vertical-align: super; margin-left: 3px; }
+    
+    /* Contenedores */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      flex: 1;
+      align-items: center;
+    }
+    .full-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+    }
+    .glass-box { 
+      background: rgba(255, 255, 255, 0.05); 
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px; 
+      border-radius: 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* Controles */
+    .controls { 
+      position: fixed; top: 20px; right: 20px; display: flex; gap: 15px; z-index: 100;
+    }
+    button.nav-btn { 
+      border: none; border-radius: 12px; padding: 12px 20px; font-size: 1.2rem;
+      cursor: pointer; background: #38bdf8; color: #020617; font-weight: bold;
+      transition: all 0.2s; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+    }
+    button.nav-btn:hover { background: #7dd3fc; transform: translateY(-2px); }
+    button.nav-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; box-shadow: none; }
+    button.nav-btn.secondary:hover { background: rgba(255,255,255,0.2); }
+    
+    .footer { 
+      position: fixed; left: 30px; right: 30px; bottom: 20px; 
+      display: flex; justify-content: space-between; 
+      color: #64748b; font-size: 1rem; z-index: 100;
+    }
+
+    /* SVG Base */
+    svg { width: 100%; height: auto; max-height: 400px; overflow: visible; }
+    .svg-icon { stroke: #38bdf8; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    
+    /* --- ESTILOS INTERACTIVOS ESPECÍFICOS --- */
+    
+    /* Botones de acción */
+    .action-btn { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+    .action-btn:hover { background: #34d399; transform: scale(1.05); }
+
+    /* Red Empresarial Animada */
+    .net-line { stroke: #64748b; stroke-width: 2; stroke-dasharray: 5,5; animation: dash 20s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -1000; } }
+
+    /* Componentes Red (Slide 3) */
+    .comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .comp-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
+    .comp-item:hover, .comp-item.selected { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+    
+    /* Topología Estrella (Slide 4) */
+    .star-line { stroke: #22c55e; stroke-width: 4; transition: 0.3s; }
+    .star-line.broken { stroke: #ef4444; stroke-dasharray: none; animation: none; }
+    .star-node { cursor: pointer; }
+    .star-node:hover circle { fill: #fde047; }
+    
+    /* Sistemas Operativos (Slide 5) */
+    .os-container { display: flex; justify-content: space-around; margin-top: 30px; }
+    .os-logo { width: 80px; height: 80px; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .os-logo:hover { transform: translateY(-15px) scale(1.1); filter: drop-shadow(0 10px 10px rgba(56, 189, 248, 0.5)); }
+
+    /* Administrador de Tareas (Slide 6) */
+    .task-manager { background: #0f172a; border: 1px solid #475569; border-radius: 10px; padding: 20px; font-family: monospace; }
+    .ram-container { height: 25px; background: #334155; border-radius: 12px; margin: 15px 0; overflow: hidden; position: relative;}
+    .ram-bar { height: 100%; width: 5%; background: #22c55e; transition: width 0.5s ease, background 0.5s ease; }
+    .ram-text { position: absolute; top: 3px; left: 10px; color: white; font-weight: bold; font-size: 14px;}
+    .app-btn { background: #1e293b; border: 1px solid #64748b; color: white; padding: 8px; margin: 5px; cursor: pointer; border-radius: 5px;}
+    .app-btn:hover { background: #334155; }
+
+    /* Pestañas Conceptos Complementarios (Slide 8) */
+    .tabs-container { display: flex; flex-direction: column; gap: 10px; }
+    .tab-btn { background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid transparent; padding: 15px; border-radius: 10px; text-align: left; font-size: 1.1rem; cursor: pointer; transition: 0.3s; }
+    .tab-btn:hover { background: rgba(56, 189, 248, 0.1); }
+    .tab-btn.active-tab { background: #38bdf8; color: #0f172a; font-weight: bold; }
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .tab-content.active-content { display: block; }
+    .uml-line { stroke: #38bdf8; stroke-width: 2; stroke-dasharray: 4; animation: march 10s linear infinite; fill: none;}
+    @keyframes march { to { stroke-dashoffset: -200; } }
+    
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <button class="nav-btn secondary" onclick="prevSlide()">◀</button>
+  <button class="nav-btn" onclick="nextSlide()">▶</button>
+</div>
+
+<!-- SLIDE 1: TÍTULO -->
+<section class="slide active">
+  <div class="full-center glass-box" style="margin: 40px;">
+    <svg width="150" height="150" viewBox="0 0 24 24" class="svg-icon" style="margin-bottom: 20px; stroke: #38bdf8; width: 120px;">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+    <h1>Redes y Sistemas Operativos</h1>
+    <p>Haz clic en los elementos interactivos, usa los botones superiores o las flechas del teclado para navegar.</p>
+  </div>
+</section>
+
+<!-- SLIDE 2: ¿QUÉ ES UNA RED? -->
+<section class="slide">
+  <h2>1. ¿Qué es una red?</h2>
+  <div class="content-grid">
+    <div class="glass-box">
+      <p>Una red de computadores es un conjunto de equipos conectados para <strong>compartir información y recursos</strong>.</p>
+      <p style="font-size: 1rem; color: #94a3b8;">💡 Presiona "Enviar Datos" para simular la comunicación.</p>
+      <button class="action-btn" onclick="sendData()">Enviar Datos ✉️</button>
+    </div>
+    <div class="glass-box" style="text-align: center;">
+      <svg viewBox="0 0 400 200">
+        <rect x="20" y="70" width="60" height="40" rx="4" class="svg-icon" />
+        <line x1="50" y1="110" x2="50" y2="130" class="svg-icon" />
+        <line x1="30" y1="130" x2="70" y2="130" class="svg-icon" />
+        <text x="50" y="150" fill="#cbd5e1" font-size="14" text-anchor="middle">PC A</text>
+        <line x1="90" y1="90" x2="310" y2="90" class="net-line" />
+        <rect x="320" y="70" width="60" height="40" rx="4" class="svg-icon" />
+        <line x1="350" y1="110" x2="350" y2="130" class="svg-icon" />
+        <line x1="330" y1="130" x2="370" y2="130" class="svg-icon" />
+        <text x="350" y="150" fill="#cbd5e1" font-size="14" text-anchor="middle">PC B</text>
+        <g id="data-packet" style="fill:#f59e0b; opacity:0; transition:all 1.5s ease-in-out;">
+          <rect x="90" y="75" width="20" height="14" fill="#10b981" rx="2" />
+          <polyline points="90,75 100,82 110,75" stroke="white" fill="none" stroke-width="1.5" />
+        </g>
+      </svg>
+      <p id="net-msg" style="color: #10b981; min-height: 20px; font-weight: bold; margin-top: 10px;"></p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: COMPONENTES DE RED -->
+<section class="slide">
+  <h2>2. Componentes de una red</h2>
+  <div class="content-grid">
+    <div class="comp-grid">
+      <div class="comp-item" onclick="showCompDesc('servidor', this)">
+        <svg class="svg-icon" style="height: 50px; margin-bottom: 10px;" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        <br>Servidor
+      </div>
+      <div class="comp-item" onclick="showCompDesc('cliente', this)">
+        <svg class="svg-icon" style="height: 50px; margin-bottom: 10px;" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        <br>Cliente
+      </div>
+      <div class="comp-item" onclick="showCompDesc('switch', this)">
+        <svg class="svg-icon" style="height: 50px; margin-bottom: 10px;" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="2"></rect><circle cx="6" cy="12" r="1"></circle><circle cx="10" cy="12" r="1"></circle><circle cx="14" cy="12" r="1"></circle><circle cx="18" cy="12" r="1"></circle></svg>
+        <br>Switch
+      </div>
+      <div class="comp-item" onclick="showCompDesc('router', this)">
+        <svg class="svg-icon" style="height: 50px; margin-bottom: 10px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+        <br>Router
+      </div>
+      <div class="comp-item" onclick="showCompDesc('firewall', this)">
+        <svg class="svg-icon" style="height: 50px; margin-bottom: 10px; stroke:#ef4444;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+        <br>Firewall
+      </div>
+    </div>
+    <div class="glass-box full-center" style="align-items: flex-start; text-align: left;">
+      <p style="color: #94a3b8; font-size: 1rem;">Haz clic en un icono a la izquierda para ver su definición.</p>
+      <div id="comp-desc">
+        <em>Selecciona un componente...</em>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: TOPOLOGÍA EN ESTRELLA -->
+<section class="slide">
+  <h2>3. Topología en estrella</h2>
+  <div class="content-grid">
+    <div class="glass-box">
+      <p>Todos los equipos se conectan a un punto central (el Switch).</p>
+      <ul>
+        <li><strong>Ventaja:</strong> Si rompes una conexión, los demás siguen funcionando.</li>
+        <li><strong>Desventaja:</strong> Si apagas el Switch central, se cae toda la red.</li>
+      </ul>
+      <p style="color: #f59e0b; font-size: 1rem; margin-top: 15px;">👉 <strong>Interactivo:</strong> Haz clic en un cable para cortarlo. Haz clic en el Switch central para apagarlo todo.</p>
+      <button class="action-btn" onclick="resetStar()" style="background: #3b82f6;">Reparar Red 🔧</button>
+    </div>
+    <div class="glass-box full-center">
+      <svg viewBox="0 0 300 300">
+        <line id="line-1" x1="150" y1="150" x2="150" y2="40" class="star-line net-line" />
+        <line id="line-2" x1="150" y1="150" x2="260" y2="150" class="star-line net-line" />
+        <line id="line-3" x1="150" y1="150" x2="150" y2="260" class="star-line net-line" />
+        <line id="line-4" x1="150" y1="150" x2="40" y2="150" class="star-line net-line" />
+        <g class="star-node" onclick="breakSwitch()">
+          <rect x="120" y="130" width="60" height="40" rx="5" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+          <text x="150" y="155" fill="white" font-size="12" text-anchor="middle" font-weight="bold">Switch</text>
+        </g>
+        <g class="star-node" onclick="breakLine('line-1', this)">
+          <circle cx="150" cy="30" r="20" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+          <text x="150" y="35" fill="white" font-size="12" text-anchor="middle">PC 1</text>
+        </g>
+        <g class="star-node" onclick="breakLine('line-2', this)">
+          <circle cx="270" cy="150" r="20" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+          <text x="270" y="155" fill="white" font-size="12" text-anchor="middle">PC 2</text>
+        </g>
+        <g class="star-node" onclick="breakLine('line-3', this)">
+          <circle cx="150" cy="270" r="20" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+          <text x="150" y="275" fill="white" font-size="12" text-anchor="middle">PC 3</text>
+        </g>
+        <g class="star-node" onclick="breakLine('line-4', this)">
+          <circle cx="30" cy="150" r="20" fill="#334155" stroke="#f8fafc" stroke-width="2"/>
+          <text x="30" y="155" fill="white" font-size="12" text-anchor="middle">PC 4</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: SISTEMAS OPERATIVOS -->
+<section class="slide">
+  <h2>4. ¿Qué es un Sistema Operativo (SO)?</h2>
+  <div class="glass-box">
+    <p>Es el software principal que gestiona los recursos del hardware y permite la comunicación entre el usuario y la máquina. Sin él, el computador es solo piezas inertes.</p>
+    
+    <div class="os-container">
+      <div class="full-center">
+        <svg class="os-logo svg-icon" style="stroke: #38bdf8;" viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="9"></rect><rect x="13" y="2" width="9" height="9"></rect><rect x="2" y="13" width="9" height="9"></rect><rect x="13" y="13" width="9" height="9"></rect></svg>
+        <p>Windows</p>
+      </div>
+      <div class="full-center">
+        <svg class="os-logo svg-icon" style="stroke: #a8a29e;" viewBox="0 0 24 24"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"></path><path d="M10 2c1 .5 2 2 2 3"></path></svg>
+        <p>macOS</p>
+      </div>
+      <div class="full-center">
+        <svg class="os-logo svg-icon" style="stroke: #fbbf24;" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        <p>Linux</p>
+      </div>
+      <div class="full-center">
+        <svg class="os-logo svg-icon" style="stroke: #22c55e;" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        <p>Android / iOS</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: FUNCIONES DEL SO -->
+<section class="slide">
+  <h2>5. Funciones del SO: Simulador</h2>
+  <div class="content-grid">
+    <div class="glass-box">
+      <p>El SO administra la memoria (RAM) y los procesos. Si abres muchos programas, el SO se encarga de repartir los recursos.</p>
+      <p style="color: #94a3b8; font-size: 1rem;">👇 Abre aplicaciones para ver cómo se llena la RAM.</p>
+      <div style="margin-top: 20px;">
+        <button class="app-btn" onclick="openApp('Word', 15)">📄 Abrir Word (15%)</button>
+        <button class="app-btn" onclick="openApp('Chrome', 30)">🌐 Abrir Chrome (30%)</button>
+        <button class="app-btn" onclick="openApp('Juego', 40)">🎮 Abrir Juego (40%)</button>
+        <br><br>
+        <button class="action-btn" onclick="closeAllApps()" style="background: #ef4444;">Cerrar todo</button>
+      </div>
+    </div>
+    
+    <div class="task-manager">
+      <h3 style="margin-top: 0; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 10px;">Administrador de Tareas</h3>
+      <p style="margin: 10px 0 5px 0;">Uso de Memoria RAM:</p>
+      <div class="ram-container">
+        <div class="ram-bar" id="ram-bar"></div>
+        <span class="ram-text" id="ram-text">5%</span>
+      </div>
+      <p style="margin: 20px 0 5px 0;">Procesos Activos:</p>
+      <ul id="process-list" style="list-style-type: none; padding: 0; margin: 0; color: #a7f3d0; font-size: 14px;">
+        <li>> Sistema OS [5%]</li>
+      </ul>
+      <p id="crash-msg" style="color: #ef4444; font-weight: bold; display: none; margin-top: 15px;">⚠️ ¡Peligro! Memoria llena. El sistema está lento.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: RELACIÓN REDES Y SO -->
+<section class="slide">
+  <h2>6. ¿Cómo se relacionan?</h2>
+  <div class="glass-box" style="margin-bottom: 20px;">
+    <p>La <strong>red</strong> provee la autopista para que viajen los datos. El <strong>Sistema Operativo</strong> es quien conduce el auto (prepara el archivo, usa la tarjeta de red y lo envía).</p>
+  </div>
+  <div class="glass-box full-center" style="flex-direction: row; justify-content: space-around;">
+    <div style="text-align: center;">
+      <svg class="svg-icon" style="width: 80px;" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      <p><strong>Windows (Cliente)</strong><br><span style="font-size: 0.9rem;">"Quiero abrir un archivo"</span></p>
+    </div>
+    
+    <div style="text-align: center;">
+      <svg class="net-line" style="width: 150px; height: 50px;" viewBox="0 0 150 50">
+        <line x1="0" y1="25" x2="150" y2="25" stroke="#38bdf8" stroke-width="4" stroke-dasharray="10,10">
+          <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" />
+        </line>
+      </svg>
+      <p style="color: #38bdf8; font-weight: bold;">Red (LAN)</p>
+    </div>
+
+    <div style="text-align: center;">
+      <svg class="svg-icon" style="width: 80px;" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect></svg>
+      <p><strong>Linux (Servidor)</strong><br><span style="font-size: 0.9rem;">"Aquí tienes el archivo"</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: CONCEPTOS COMPLEMENTARIOS (NUEVO) -->
+<section class="slide">
+  <h2>7. Aplicaciones y Conceptos Complementarios</h2>
+  <div class="content-grid" style="grid-template-columns: 1fr 2fr;">
+    
+    <!-- Pestañas (Botones) -->
+    <div class="tabs-container">
+      <button class="tab-btn active-tab" onclick="openTab(event, 'tab-metodo')">🧪 1. Método Científico</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-uml')">📊 2. Diagramas UML</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-arbol')">🌳 3. Topología en Árbol</button>
+      <button class="tab-btn" onclick="openTab(event, 'tab-bios')">⚙️ 4. El BIOS</button>
+    </div>
+
+    <!-- Contenido Pestañas -->
+    <div class="glass-box" style="height: 100%;">
+      
+      <!-- Contenido 1 -->
+      <div id="tab-metodo" class="tab-content active-content">
+        <h3>Ejemplo Práctico: Método Científico</h3>
+        <p><strong>Pregunta:</strong> ¿Cómo puedo hacer madurar una palta (aguacate) más rápido? <cite>[3]</cite></p>
+        <p><strong>Hipótesis:</strong> La palta madura más rápido estando junto a otra fruta ya madura rica en etileno (ej. plátano o manzana). <cite>[4]</cite></p>
+        <p><strong>Experimento y Análisis:</strong> Diseñar el experimento recreando varias situaciones distintas (palta sola vs palta con plátano) y anotar lo que pasa todos los días. <cite>[4]</cite></p>
+      </div>
+
+      <!-- Contenido 2 -->
+      <div id="tab-uml" class="tab-content">
+        <h3>Ejemplo básico utilizando UML</h3>
+        <p><strong>Diagrama de Casos de Uso:</strong> Sirve para modelar visualmente cómo interactúa el usuario con el sistema.</p>
+        <div style="text-align: center; margin-top: 20px;">
+          <svg viewBox="0 0 400 150">
+            <!-- Actor -->
+            <circle cx="50" cy="50" r="15" class="svg-icon"/>
+            <line x1="50" y1="65" x2="50" y2="100" class="svg-icon"/>
+            <line x1="50" y1="80" x2="25" y2="70" class="svg-icon"/>
+            <line x1="50" y1="80" x2="75" y2="70" class="svg-icon"/>
+            <line x1="50" y1="100" x2="30" y2="130" class="svg-icon"/>
+            <line x1="50" y1="100" x2="70" y2="130" class="svg-icon"/>
+            <text x="50" y="150" fill="#cbd5e1" font-size="14" text-anchor="middle">Usuario (Actor)</text>
+            <!-- Líneas de interacción -->
+            <line x1="80" y1="75" x2="200" y2="40" class="uml-line" />
+            <line x1="80" y1="75" x2="200" y2="110" class="uml-line" />
+            <!-- Casos de uso -->
+            <ellipse cx="280" cy="40" rx="70" ry="25" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="280" y="45" fill="white" font-size="14" text-anchor="middle">Iniciar sesión</text>
+            
+            <ellipse cx="280" cy="110" rx="70" ry="25" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="280" y="115" fill="white" font-size="14" text-anchor="middle">Acceder BD</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Contenido 3 -->
+      <div id="tab-arbol" class="tab-content">
+        <h3>Topología en Árbol (Estrella Extendida)</h3>
+        <p>Es la más común en empresas. Varios Switches se conectan a un Router central. Esto permite que si un departamento falla, el resto de la empresa siga teniendo red.</p>
+        <div style="text-align: center;">
+          <svg viewBox="0 0 300 150">
+            <!-- Router Superior -->
+            <circle cx="150" cy="30" r="20" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
+            <text x="150" y="35" fill="white" font-size="12" text-anchor="middle">Router</text>
+            <!-- Conexiones principales -->
+            <line x1="150" y1="50" x2="75" y2="80" class="net-line"/>
+            <line x1="150" y1="50" x2="225" y2="80" class="net-line"/>
+            <!-- Switches (Departamentos) -->
+            <rect x="55" y="80" width="40" height="20" rx="3" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+            <text x="75" y="94" fill="white" font-size="10" text-anchor="middle">Sw 1</text>
+            <rect x="205" y="80" width="40" height="20" rx="3" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+            <text x="225" y="94" fill="white" font-size="10" text-anchor="middle">Sw 2</text>
+            <!-- Conexiones a PCs -->
+            <line x1="75" y1="100" x2="50" y2="130" class="net-line"/>
+            <line x1="75" y1="100" x2="100" y2="130" class="net-line"/>
+            <line x1="225" y1="100" x2="200" y2="130" class="net-line"/>
+            <line x1="225" y1="100" x2="250" y2="130" class="net-line"/>
+            <!-- PCs (puntos) -->
+            <circle cx="50" cy="130" r="5" fill="#a7f3d0"/>
+            <circle cx="100" cy="130" r="5" fill="#a7f3d0"/>
+            <circle cx="200" cy="130" r="5" fill="#a7f3d0"/>
+            <circle cx="250" cy="130" r="5" fill="#a7f3d0"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Contenido 4 -->
+      <div id="tab-bios" class="tab-content">
+        <h3>Hardware Principal: El BIOS</h3>
+        <p><strong>Basic Input/Output System</strong></p>
+        <ul style="margin-top: 15px;">
+          <li>Es el primer programa que se ejecuta cuando se enciende la computadora <cite>[74]</cite>.</li>
+          <li>Su propósito fundamental es iniciar y probar todo el hardware del sistema para luego cargar el sistema operativo <cite>[75]</cite>.</li>
+          <li>Actúa como una capa de abstracción, permitiendo que los programas interactúen con componentes como el teclado o el monitor <cite>[76]</cite>.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: CONCLUSIÓN -->
+<section class="slide">
+  <div class="full-center glass-box" style="margin: 40px; border-color: #22c55e;">
+    <h1 style="color: #22c55e; text-shadow: 0 0 20px rgba(34, 197, 94, 0.4);">¡Resumen Final!</h1>
+    <p style="font-size: 1.5rem; max-width: 800px;">
+      Las <strong>Redes</strong> conectan equipos. <br>
+      Los <strong>Sistemas Operativos</strong> hacen que los equipos funcionen. <br><br>
+      Juntos forman la base de la tecnología moderna, permitiendo que podamos trabajar, estudiar y comunicarnos a nivel mundial.
+    </p>
+    <button class="action-btn" onclick="showSlide(0)" style="margin-top: 30px; font-size: 1.2rem; padding: 15px 30px;">Volver al Inicio 🔄</button>
+  </div>
+</section>
+
+<div class="footer">
+  <span>Usa las flechas del teclado ⌨️</span>
+  <span id="count">1 / 9</span>
+</div>
+
+<script>
+// --- LÓGICA DE NAVEGACIÓN ---
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+
+document.getElementById('count').textContent = '1 / ' + slides.length;
+
+function showSlide(i){
+  slides[current].classList.remove('active');
+  current = (i + slides.length) % slides.length;
+  slides[current].classList.add('active');
+  document.getElementById('count').textContent = (current + 1) + ' / ' + slides.length;
+}
+
+function nextSlide(){ showSlide(current + 1); }
+function prevSlide(){ showSlide(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  if(e.key === 'ArrowLeft') prevSlide();
+});
+
+// --- LÓGICA INTERACTIVA SLIDE 2 ---
+function sendData() {
+  const packet = document.getElementById('data-packet');
+  const msg = document.getElementById('net-msg');
+  packet.style.transform = "translateX(0)";
+  packet.style.opacity = "0";
+  msg.textContent = "";
+  
+  void packet.offsetWidth; 
+  
+  packet.style.opacity = "1";
+  packet.style.transform = "translateX(230px)";
+  msg.textContent = "Enviando...";
+  
+  setTimeout(() => { msg.textContent = "¡Mensaje recibido en PC B!"; }, 1500);
+}
+
+// --- LÓGICA INTERACTIVA SLIDE 3 ---
+const descripciones = {
+  'servidor': '<strong>Servidor:</strong> Computador diseñado para atender peticiones. Guarda bases de datos, páginas web, etc.',
+  'cliente': '<strong>Cliente:</strong> Equipo que consume los recursos o servicios que ofrece el servidor.',
+  'switch': '<strong>Switch:</strong> Dispositivo central que conecta múltiples equipos dentro de una misma red local (LAN).',
+  'router': '<strong>Router:</strong> Conecta diferentes redes entre sí. Permite que tu red local salga hacia Internet.',
+  'firewall': '<strong>Firewall:</strong> Sistema de seguridad que bloquea accesos no autorizados a la red.'
+};
+
+function showCompDesc(key, element) {
+  document.querySelectorAll('.comp-item').forEach(el => el.classList.remove('selected'));
+  element.classList.add('selected');
+  document.getElementById('comp-desc').innerHTML = descripciones[key];
+}
+
+// --- LÓGICA INTERACTIVA SLIDE 4 ---
+let isSwitchBroken = false;
+
+function breakLine(lineId, node) {
+  if (isSwitchBroken) return;
+  const line = document.getElementById(lineId);
+  if (line.classList.contains('broken')) {
+    line.classList.remove('broken');
+    node.querySelector('circle').setAttribute('fill', '#334155');
+  } else {
+    line.classList.add('broken');
+    node.querySelector('circle').setAttribute('fill', '#ef4444');
+  }
+}
+
+function breakSwitch() {
+  isSwitchBroken = !isSwitchBroken;
+  const lines = document.querySelectorAll('.star-line');
+  const circles = document.querySelectorAll('.star-node circle');
+  const switchRect = document.querySelector('.star-node rect');
+  
+  if (isSwitchBroken) {
+    lines.forEach(l => l.classList.add('broken'));
+    circles.forEach(c => c.setAttribute('fill', '#ef4444'));
+    switchRect.setAttribute('fill', '#ef4444');
+  } else {
+    resetStar();
+  }
+}
+
+function resetStar() {
+  isSwitchBroken = false;
+  document.querySelectorAll('.star-line').forEach(l => l.classList.remove('broken'));
+  document.querySelectorAll('.star-node circle').forEach(c => c.setAttribute('fill', '#334155'));
+  document.querySelector('.star-node rect').setAttribute('fill', '#1e293b');
+}
+
+// --- LÓGICA INTERACTIVA SLIDE 6 ---
+let ramUsage = 5;
+const processList = document.getElementById('process-list');
+const ramBar = document.getElementById('ram-bar');
+const ramText = document.getElementById('ram-text');
+const crashMsg = document.getElementById('crash-msg');
+
+function openApp(name, cost) {
+  if (ramUsage >= 100) return;
+  ramUsage += cost;
+  if (ramUsage > 100) ramUsage = 100;
+  
+  updateRamVisuals();
+  
+  const li = document.createElement('li');
+  li.textContent = `> ${name} [${cost}%]`;
+  processList.appendChild(li);
+}
+
+function closeAllApps() {
+  ramUsage = 5;
+  processList.innerHTML = '<li>> Sistema OS [5%]</li>';
+  updateRamVisuals();
+}
+
+function updateRamVisuals() {
+  ramBar.style.width = ramUsage + '%';
+  ramText.textContent = ramUsage + '%';
+  
+  if (ramUsage < 60) {
+    ramBar.style.background = '#22c55e';
+    crashMsg.style.display = 'none';
+  } else if (ramUsage < 90) {
+    ramBar.style.background = '#f59e0b';
+    crashMsg.style.display = 'none';
+  } else {
+    ramBar.style.background = '#ef4444';
+    crashMsg.style.display = 'block';
+  }
+}
+
+// --- LÓGICA PESTAÑAS (SLIDE 8) ---
+function openTab(evt, tabName) {
+  // Ocultar todos los contenidos
+  const tabcontents = document.getElementsByClassName("tab-content");
+  for (let i = 0; i < tabcontents.length; i++) {
+    tabcontents[i].classList.remove("active-content");
+  }
+  
+  // Quitar clase "active-tab" a todos los botones
+  const tablinks = document.getElementsByClassName("tab-btn");
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove("active-tab");
+  }
+  
+  // Mostrar el tab actual y agregar clase "active-tab" al botón pulsado
+  document.getElementById(tabName).classList.add("active-content");
+  evt.currentTarget.classList.add("active-tab");
+}
+</script>
+</body>
+</html>
